@@ -6,6 +6,8 @@ public class Boid : MonoBehaviour
 {
     List<SteeringBehaviour> behaviours = new List<SteeringBehaviour>();
 
+    public PodControl podControl;
+
     public Vector3 force = Vector3.zero;
     public Vector3 acceleration = Vector3.zero;
     public Vector3 velocity = Vector3.zero;
@@ -106,8 +108,17 @@ public class Boid : MonoBehaviour
         velocity += acceleration * Time.deltaTime;
 
         velocity = Vector3.ClampMagnitude(velocity, maxSpeed);
-        
-        if (velocity.magnitude > 0)
+
+        if (podControl.isInPod == true && Input.GetKey(KeyCode.W))
+        {
+            Vector3 tempUp = Vector3.Lerp(transform.up, Vector3.up + (acceleration * banking), Time.deltaTime * 3.0f);
+            transform.LookAt(transform.position + velocity, tempUp);
+
+            transform.position += velocity * Time.deltaTime;
+            velocity *= (1.0f - (damping * Time.deltaTime));
+        }
+
+        else if (podControl.isInPod == false && velocity.magnitude > 0)
         {
             Vector3 tempUp = Vector3.Lerp(transform.up, Vector3.up + (acceleration * banking), Time.deltaTime * 3.0f);
             transform.LookAt(transform.position + velocity, tempUp);
